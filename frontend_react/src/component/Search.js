@@ -4,7 +4,8 @@ import TalkOrder from "./TalkOrder"; // Component to display filtered talks
 const Search = ({ talks }) => {
   const [searchField, setSearchField] = useState("");
 
-  // Filter talks based on the searchField input
+  // Filter talks based on the search bar of the user input and return the 
+  // value turned to lowercase for case-insensitive search so that the user can search for talks by title or speaker.
   const filteredTalks = talks.filter((talk) => {
     return (
       talk.title.toLowerCase().includes(searchField.toLowerCase()) ||

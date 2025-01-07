@@ -16,7 +16,7 @@ const TalkFilterPage = ({ loggedInUser }) => {
   const [comments, setComments] = useState({}); // Comments mapped by talkId
   
 
-  // Fetch talks data
+  // Fetch talks data from the API or the database 
   useEffect(() => {
     fetch("http://localhost:3001/talks")
       .then((response) => response.json())
@@ -45,7 +45,7 @@ const TalkFilterPage = ({ loggedInUser }) => {
   const sessions = [...new Set(talks.map((talk) => talk.session))];
   const tags = [...new Set(talks.flatMap((talk) => talk.tags))];
   const times = [...new Set(talks.map((talk) => talk.time))];
-  const speakers = [...new Set(talks.map((talk) => talk.speaker))]; // Extract unique speakers
+  const speakers = [...new Set(talks.map((talk) => talk.speaker))]; 
 
   // Filter talks
   useEffect(() => {
@@ -88,16 +88,20 @@ const TalkFilterPage = ({ loggedInUser }) => {
       alert("Please log in to add talks to your itinerary.");
       return;
     }
-
-    // Check for time conflicts in the user's current itinerary
+  
     const checkingTime = itinerary.some((existingTalk) => existingTalk.time === talk.time);
-
     if (checkingTime) {
       alert("Time conflict: A talk is already scheduled at this time.");
       return;
     }
 
-    // Proceed with adding the talk
+    // Check for duplicate talks
+    const isDuplicate = itinerary.some((existingTalk) => existingTalk.id === talk.id);
+    if (isDuplicate) {
+      alert("This talk is already in your itinerary.");
+      return;
+    }
+  
     fetch("http://localhost:3001/itinerary", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -106,14 +110,16 @@ const TalkFilterPage = ({ loggedInUser }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.message) {
-          alert(data.message); // Display success message
-          setItinerary((prev) => [...prev, talk]); // Update local itinerary
+          alert(data.message);
+          setItinerary((prev) => [...prev, talk]);
         } else if (data.error) {
-          alert(`Error: ${data.error}`);
+          alert(data.error);
         }
       })
       .catch((err) => console.error("Error adding to itinerary:", err));
   };
+  
+
 
   // Toggle mark/unmark a talk as interesting
   const toggleMarkTalk = (talkId) => {
@@ -159,7 +165,6 @@ const TalkFilterPage = ({ loggedInUser }) => {
     const total = ratings.reduce((sum, rating) => sum + rating, 0);
     return (total / ratings.length).toFixed(1);
   };
-
   // Fetch comments for a specific talk
   const fetchComments = (talkId) => {
     fetch(`http://localhost:3001/talks/${talkId}/comments`)
@@ -172,7 +177,16 @@ const TalkFilterPage = ({ loggedInUser }) => {
       )
       .catch((error) => console.error("Error fetching comments:", error));
   };
-
+  // Fetch comments for all talks for all the user can see the comments
+  useEffect(() => {
+    // Fetch comments for all talks
+    talks.forEach((talk) => {
+      fetch(`http://localhost:3001/talks/${talk.id}/comments`)
+        .then((response) => response.json())
+        .then((data) => setComments((prev) => ({ ...prev, [talk.id]: data })))
+        .catch((error) => console.error(`Error fetching comments for talk ${talk.id}:`, error));
+    });
+  }, [talks]);
   // Add a comment
   const addComment = (talkId, commentText) => {
     if (!loggedInUser) {
@@ -201,8 +215,12 @@ const TalkFilterPage = ({ loggedInUser }) => {
     })
       .then((response) => response.json())
       .then((data) => {
-        alert(data.message);
-        fetchComments(talkId);
+        if (data.message) {
+          alert(data.message);
+          fetchComments(talkId); // Refresh comments for the talk
+        } else {
+          alert("Failed to delete comment.");
+        }
       })
       .catch((error) => console.error("Error deleting comment:", error));
   };
@@ -300,7 +318,7 @@ const TalkFilterPage = ({ loggedInUser }) => {
 
           <div className="mb-3">
             <label htmlFor="rating" className="form-label">
-              Minimum Rating: {minRating}
+              Minimum Rating Range: {minRating}
             </label>
             <input
               type="range"
@@ -378,50 +396,57 @@ const TalkFilterPage = ({ loggedInUser }) => {
                     />
                     ))}
                     </div>
+                    <br></br>
                      {/* Comments Section */}
-                     
-            <div className="card-body">
-            <h6>Comments:</h6>
-            <ul>
-              {comments[talk.id]?.map((comment) => (
-                <li key={comment.id} className="d-flex justify-content-between">
-                  <span>
-                    <strong>{comment.username}:</strong> {comment.text}
-                  </span>
-                  {comment.username === loggedInUser && (
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => deleteComment( comment.id, loggedInUser)}
-                    >
-                      Delete
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
-            {loggedInUser && (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const commentText = e.target.comment.value;
-                  addComment(talk.id, commentText);
-                  e.target.reset();
-                }}
-              >
-                <input
-                  type="text"
-                  name="comment"
-                  placeholder="Add a comment"
-                  className="form-control"
-                />
-                <button type="submit" className="btn btn-primary mt-2">
-                  Submit
-                </button>
-              </form>
-            )}
-          </div>           
-            {/* Add to Itinerary Button */}
-            {loggedInUser && (
+                     <div className="card-body">
+                     <h6>Comments:</h6>
+                     <ul>
+                     {comments[talk.id]?.length > 0 ? (
+                     comments[talk.id].map((comment) => (
+                     <li key={comment.id} className="d-flex justify-content-between">
+                     <span>
+                     <strong>{comment.username}:</strong> {comment.text}
+                     </span>
+          {loggedInUser === comment.username && (
+            <button
+              className="btn btn-sm btn-danger"
+              onClick={() => deleteComment(talk.id, comment.id)}
+            >
+              Delete
+            </button>
+          )}
+        </li>
+      ))
+    ) : (
+      <li>No comments yet. Be the first to comment by registering as login user!</li>
+    )}
+  </ul>
+  {loggedInUser && (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        const commentText = e.target.comment.value;
+        addComment(talk.id, commentText);
+        e.target.reset();
+      }}
+    >
+      <input
+        type="text"
+        name="comment"
+        placeholder="Add a comment"
+        className="form-control"
+        required
+      />
+      <button type="submit" className="btn btn-primary mt-2">
+      Add new comment
+      </button>
+    </form>
+  )}
+</div>
+
+         
+{/* Add to Itinerary Button */}
+   {loggedInUser && (
               <button className="btn btn-primary mt-3" onClick={() => addToItinerary(talk)}>
                 Add talks details to your itinerary
               </button>
@@ -431,7 +456,7 @@ const TalkFilterPage = ({ loggedInUser }) => {
       ))}
     </ul>
   ) : (
-    <p>No talks match the selected filters.</p>
+    <p>No talks match the selected filters that you selected .</p>
   )}
 </div>
 </div>
@@ -440,7 +465,6 @@ const TalkFilterPage = ({ loggedInUser }) => {
 };
 
 export default TalkFilterPage;
-
 
 
 

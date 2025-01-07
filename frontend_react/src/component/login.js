@@ -1,24 +1,26 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// Login component to allow users to login to the website
+const Login = ({ setLoggedInUser, setUserRole }) => { // Set the loggedInUser and userRole states
+  const [formData, setFormData] = useState({ username: "", password: "" }); // Set the formData state
+  const [error, setError] = useState(null); // Set the error state
+  const navigate = useNavigate(); // Use the navigate hook to redirect to different pages
 
-const Login = ({ setLoggedInUser, setUserRole }) => {
-  const [formData, setFormData] = useState({ username: "", password: "" });
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
-
+  // Handle input changes in the form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e) => {
+  // Handle form submission to login a user
+  const handleSubmit = async (e) => { 
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:3001/login", {
+      const response = await fetch("http://localhost:3001/login", { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
-
+      // Get the response data and display the message
       const data = await response.json();
 
       if (response.ok) {

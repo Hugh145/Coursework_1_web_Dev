@@ -1,5 +1,7 @@
 import React from "react";
-
+// Star component to display a star icon that the user can click to select a talk from
+// talkfilterPage so that the user can add the own rating score and 
+// style the star in gold colour and background gray and the size by24x24.
 const Star = ({ selected, onSelect }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

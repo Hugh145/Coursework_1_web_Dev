@@ -1,7 +1,13 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate} from "react-router-dom";
 
 const Navigation = ({ loggedInUser, userRole, handleLogout }) => {
+  const navigate = useNavigate();
+
+  const logoutAndRedirect = () => {
+    handleLogout(); // Clear loggedInUser state
+    navigate("/"); // Redirect to home page
+  };
   return (
     <div className="container-fluid bg-white sticky-top">
       <div className="container">
@@ -44,10 +50,7 @@ const Navigation = ({ loggedInUser, userRole, handleLogout }) => {
                   <NavLink to="/userProfilePage" className="nav-item nav-link">
                   Profile Details
                   </NavLink>
-                  <button
-                    className="btn btn-outline-primary nav-item nav-link"
-                    onClick={handleLogout}
-                  >
+                  <button className="btn btn-danger nav-item nav-link" onClick={logoutAndRedirect}>
                     Logout
                   </button>
                 </>

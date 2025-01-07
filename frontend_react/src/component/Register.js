@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+// Register page component to allow users to register for an account as user role.
 const Register = () => {
   const [formData, setFormData] = useState({
     email: "",
@@ -14,12 +14,12 @@ const Register = () => {
 
   const [message, setMessage] = useState(null); // To display success or error messages
 
-  // Handle input changes
+  // Handle input changes in the form
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle form submission
+  // Handle form submission to register a new user
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -28,7 +28,7 @@ const Register = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...formData, role: "user" }), // Automatically set role to "user"
       });
-
+      // Get the response data and display the message 
       const data = await response.json();
 
       if (response.ok) {

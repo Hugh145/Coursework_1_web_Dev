@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import TalkItem from "./TalkItem";
 
+// TalkOrder component to display a list of talks and their details that the user can select from the list.
 const TalkOrder = ({ talks }) => {
   const [selectedTalk, setSelectedTalk] = useState(null);
 
@@ -13,7 +14,7 @@ const TalkOrder = ({ talks }) => {
       <div className="row">
         {/* Left column: list of talks */}
         <div className="col-3 submenu">
-          <h2>Talks</h2>
+          <h2>Talks list</h2>
           <ul className="list-group">
             {talks.map((talk) => (
               <TalkItem key={talk.id} talk={talk} onClick={handleTalkClick} />
@@ -69,7 +70,7 @@ const TalkOrder = ({ talks }) => {
       )}
     </div>
   ) : (
-    <p>Please select a talk from the menu.</p>
+    <p>Please select a talk from the list.</p>
   )}
 </div>
 </div>
