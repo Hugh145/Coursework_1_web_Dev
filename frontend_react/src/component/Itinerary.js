@@ -10,7 +10,7 @@ const Itinerary = ({ loggedInUser }) => {
       setError("Please log in to view your itinerary.");
       return;
     }
-
+    // Fetch the user's itinerary from the server
     fetch(`http://localhost:3001/itinerary/${loggedInUser}`)
       .then((response) => {
         if (!response.ok) {

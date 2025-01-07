@@ -36,21 +36,22 @@ const UserProfilePage = ({ loggedInUser }) => {
         });
     }
   }, [loggedInUser]);
-
+  
+  // Handle input changes in the form to update the user details
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
+  }; 
+  // Handle form submission to update the user details
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Sending update request:", { username: loggedInUser, updates: formData });
 
-    // Check if changes have been made
+    // Check if changes have been made to the user details
     if (JSON.stringify(formData) === JSON.stringify(originalData)) {
       setMessage({ type: "info", text: "No changes made to update." });
       return;
     }
-
+//send the updated data to the server
     try {
       const response = await fetch("http://localhost:3001/updateProfile", {
         method: "PUT",

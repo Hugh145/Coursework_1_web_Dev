@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Star from "./star"
 
+// TalkFilterPage component to display talks and filter options for the user to filter the talks information
 
 const TalkFilterPage = ({ loggedInUser }) => { 
   const [talks, setTalks] = useState([]);//storing the talks information
@@ -159,7 +160,7 @@ const TalkFilterPage = ({ loggedInUser }) => {
       })
       .catch((err) => console.error("Error rating talk:", err));
   };
-
+  // Get the average rating for a talk
   const getAverageRating = (ratings) => {
     if (ratings.length === 0) return 0;
     const total = ratings.reduce((sum, rating) => sum + rating, 0);

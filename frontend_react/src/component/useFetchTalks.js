@@ -1,19 +1,22 @@
 import { useEffect, useState, useCallback } from "react";
-
+// // Custom hook to fetch and manage talks data from an API 
 const useFetchTalks = () => {
-  const [status, setStatus] = useState("idle");  // 'idle' | 'loading' | 'fetched' | ...
+   // State to track the current status of the data fetching process
+  const [status, setStatus] = useState("idle");  // 'idle' | 'loading' | 'fetched' | 'error'
+  // State to store the fetched talks data
   const [talks, setTalks] = useState([
     {
-      id: "",
-      title: "",
-      speaker: "",
-      session: "",
-      time: "",
+      id: "", // Unique identifier for the talk
+      title: "", // Title of the talk
+      speaker: "", // Name of the speaker eg John Doe
+      session: "", // Session of the talk eg A or B 
+      time: "",   // Time of the talk 
     },
   ]);
 
+  //// State to store the fetched talks data
   const fetchData = useCallback(() => {
-    const url = "http://localhost:3001/talks"; // Adjust this to match your endpoint
+    const url = "http://localhost:3001/talks"; // URL of the API endpoint to fetch talks data
     fetch(url)
       .then((response) => response.json())
       .then((incomingData) => {

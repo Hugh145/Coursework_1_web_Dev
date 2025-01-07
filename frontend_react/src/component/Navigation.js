@@ -1,8 +1,8 @@
 import React from "react";
 import { NavLink, useNavigate} from "react-router-dom";
-
-const Navigation = ({ loggedInUser, userRole, handleLogout }) => {
-  const navigate = useNavigate();
+// navigation bar component of the website that is displayed on all pages
+const Navigation = ({ loggedInUser, userRole, handleLogout }) => { 
+  const navigate = useNavigate(); // Hook for navigation
 
   const logoutAndRedirect = () => {
     handleLogout(); // Clear loggedInUser state
